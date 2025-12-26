@@ -10,8 +10,7 @@ export default function Properties() {
   const [refresh, setRefresh] = useState(false)
 
   useEffect(() => {
-    fetch("https://real-estate-ai.onrender.com/properties?page=1&limit=100")
-      .then(res => res.json())
+fetch(`${import.meta.env.VITE_API_URL}/properties?page=1&limit=100`)      .then(res => res.json())
       .then(data => setProperties(data.data || []))
   }, [])
 
