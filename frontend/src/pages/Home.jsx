@@ -20,7 +20,7 @@ export default function Home() {
 
   // Load featured properties
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/properties?page=1&limit=6")
+    fetch("https://real-estate-ai.onrender.com/properties?page=1&limit=6")
       .then(res => res.json())
       .then(data => setProperties(data.data || []))
   }, [])
