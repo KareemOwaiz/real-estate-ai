@@ -62,8 +62,7 @@ def get_properties(page: int = 1, limit: int = 12):
         prop["parking"] = int(prop.get("parking") or random.randint(0, 2))
 
         image_number = (idx % 500) + 1
-        prop["image_url"] = f"http://127.0.0.1:8000/images/{image_number}.jpg"
-
+        prop["image_url"] = f"{BASE_URL}/images/{image_number}.jpg"
         properties.append(prop)
 
     return {
