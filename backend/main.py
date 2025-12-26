@@ -7,39 +7,51 @@ import os
 import joblib
 import random
 
-app = FastAPI()
+# -------------------- APP --------------------
+app = FastAPI(title="RealEstateAI API")
 
 # -------------------- CORS --------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],   # OK for demo/portfolio
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# -------------------- PATHS --------------------
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-CSV_PATH = os.path.join(BASE_DIR, "data", "processed", "properties_master.csv")
-IMAGES_DIR = os.path.join(BASE_DIR, "backend", "images")
-MODEL_PATH = os.path.join(BASE_DIR, "ml", "model.pkl")
-BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000")
+# -------------------- BASE PATHS --------------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# -------------------- LOAD MODEL --------------------
+CSV_PATH = os.path.join(BASE_DIR, "data", "processed", "properties_master.csv")
+IMAGES_DIR = os.path.join(BASE_DIR, "images")
+MODEL_PATH = os.path.join(BASE_DIR, "ml", "model.pkl")
+
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
+
+# -------------------- VALIDATION --------------------
+if not os.path.exists(CSV_PATH):
+    raise RuntimeError(f"CSV file not found: {CSV_PATH}")
+
+if not os.path.exists(IMAGES_DIR):
+    raise RuntimeError(f"Images directory not found: {IMAGES_DIR}")
+
+# -------------------- LOAD ML MODEL --------------------
 model = None
 if os.path.exists(MODEL_PATH):
     model = joblib.load(MODEL_PATH)
-    print("✅ ML model loaded")
+    print("✅ ML model loaded successfully")
+else:
+    print("⚠️ model.pkl not found – prediction disabled")
 
-# -------------------- STATIC FILES --------------------
+# -------------------- STATIC IMAGES --------------------
 app.mount("/images", StaticFiles(directory=IMAGES_DIR), name="images")
 
 # -------------------- ROOT --------------------
 @app.get("/")
 def root():
-    return {"status": "API is running"}
+    return {"status": "RealEstateAI API running"}
 
-# -------------------- PROPERTIES --------------------
+# -------------------- PROPERTIES API --------------------
 @app.get("/properties")
 def get_properties(page: int = 1, limit: int = 12):
     df = pd.read_csv(CSV_PATH, encoding="latin1", low_memory=False)
@@ -55,7 +67,7 @@ def get_properties(page: int = 1, limit: int = 12):
     for idx, row in df_page.iterrows():
         prop = row.to_dict()
 
-        # 🔥 Force demo realism
+        # 🔥 Demo realism
         prop["city"] = cities[idx % len(cities)]
         prop["bedrooms"] = int(prop.get("bedrooms") or random.randint(1, 4))
         prop["bathrooms"] = int(prop.get("bathrooms") or random.randint(1, 3))
@@ -63,6 +75,7 @@ def get_properties(page: int = 1, limit: int = 12):
 
         image_number = (idx % 500) + 1
         prop["image_url"] = f"{BASE_URL}/images/{image_number}.jpg"
+
         properties.append(prop)
 
     return {
@@ -78,8 +91,7 @@ class PredictionInput(BaseModel):
     bedrooms: int
     bathrooms: int
     parking: int
-    city: str | None = "Bangalore"   # optional, safe default
-
+    city: str | None = "Bangalore"
 
 # -------------------- PRICE PREDICTION --------------------
 @app.post("/predict-price")
@@ -88,27 +100,25 @@ def predict_price(data: PredictionInput):
         raise HTTPException(status_code=503, detail="ML model not available")
 
     try:
-        # ✅ FORCE 5 FEATURES (MODEL-SAFE)
+        # ✅ MODEL SAFE INPUT (5 FEATURES)
         area = float(data.area_sqft)
         bedrooms = int(data.bedrooms)
         bathrooms = int(data.bathrooms)
-        stories = 1            # 🔒 fixed (model was trained with this)
+        stories = 1  # fixed (model trained with this)
         parking = int(data.parking)
 
         X = [[area, bedrooms, bathrooms, stories, parking]]
 
-        # 🔒 HARD SAFETY CHECK
+        # Safety check
         if hasattr(model, "n_features_in_"):
             if model.n_features_in_ != len(X[0]):
                 raise ValueError(
-                    f"Model expects {model.n_features_in_} features, "
-                    f"received {len(X[0])}"
+                    f"Model expects {model.n_features_in_} features, received {len(X[0])}"
                 )
 
-        # 🤖 ML prediction
         base_price = model.predict(X)[0]
 
-        # -------------------- REALISM BOOST --------------------
+        # 🔥 Realism boost
         adjustment = (
             bedrooms * 300_000 +
             bathrooms * 200_000 +
