@@ -10,7 +10,7 @@ export default function Properties() {
   const [refresh, setRefresh] = useState(false)
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/properties?page=1&limit=100")
+    fetch("https://real-estate-ai.onrender.com/properties?page=1&limit=100")
       .then(res => res.json())
       .then(data => setProperties(data.data || []))
   }, [])
