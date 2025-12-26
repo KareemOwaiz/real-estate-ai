@@ -7,7 +7,7 @@ export default function PropertyDetails() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/properties?page=1&limit=100")
+    fetch("http://https://real-estate-ai.onrender.com/properties?page=1&limit=100")
       .then(res => res.json())
       .then(data => {
         setProperty(data.data?.[id])
