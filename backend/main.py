@@ -23,6 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 CSV_PATH = os.path.join(BASE_DIR, "data", "processed", "properties_master.csv")
 IMAGES_DIR = os.path.join(BASE_DIR, "backend", "images")
 MODEL_PATH = os.path.join(BASE_DIR, "ml", "model.pkl")
+BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000")
 
 # -------------------- LOAD MODEL --------------------
 model = None
