@@ -23,7 +23,7 @@ export default function PricePredictor() {
     setLoading(true)
 
     try {
-      const res = await fetch("https://real-estate-ai.onrender.com/predict-price", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/predict-price`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
