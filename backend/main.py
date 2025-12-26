@@ -20,17 +20,19 @@ app.add_middleware(
 )
 
 # -------------------- BASE PATHS --------------------
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# -------------------- BASE PATHS --------------------
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 CSV_PATH = os.path.join(BASE_DIR, "data", "processed", "properties_master.csv")
-IMAGES_DIR = os.path.join(BASE_DIR, "images")
-MODEL_PATH = os.path.join(BASE_DIR, "ml", "model.pkl")
+IMAGES_DIR = os.path.join(BASE_DIR, "backend", "images")
+MODEL_PATH = os.path.join(BASE_DIR, "backend", "ml", "model.pkl")
 
 BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
 
-# -------------------- VALIDATION --------------------
 if not os.path.exists(CSV_PATH):
-    raise RuntimeError(f"CSV file not found: {CSV_PATH}")
+    print(f"⚠️ CSV file not found at {CSV_PATH}")
+
+# -------------------- VALIDATION -------------------
 
 if not os.path.exists(IMAGES_DIR):
     raise RuntimeError(f"Images directory not found: {IMAGES_DIR}")
