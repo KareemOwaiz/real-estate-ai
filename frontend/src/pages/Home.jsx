@@ -51,7 +51,7 @@ export default function Home() {
               Browse properties, filter by city, and predict accurate prices using Machine Learning.
             </p>
 
-            <div className="mt-8 flex gap-4">
+            <div className="mt-8 flex flex-col sm:flex-row gap-4">
               <Link
                 to="/properties"
                 className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold"
@@ -86,7 +86,7 @@ export default function Home() {
       </section>
 
       {/* ================= FEATURED PROPERTIES ================= */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-20">
         <div className="flex justify-between items-center mb-10">
           <h2 className="text-3xl font-bold">Featured Properties</h2>
           <Link to="/properties" className="text-blue-600 font-semibold">
